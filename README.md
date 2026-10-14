@@ -2,6 +2,10 @@
 
 **One AI. Every Task. Seamless Execution.**
 
+OmniFlow AI is a multimodal AI assistant built with LangGraph, featuring research, weather,
+currency conversion, document RAG, data analysis, SQL, planning, coding assistance, memory,
+and image generation.
+
 OmniFlow AI is a modular, agentic assistant built with LangGraph, Google Gemini and
 Streamlit. It extends the [CampusX LangGraph chatbot tutorial](https://github.com/campusx-official/chatbot-in-langgraph)
 and is being built in small, verified phases.
