@@ -6,7 +6,7 @@ import tempfile
 from typing import Annotated, Any, Dict, Optional, TypedDict
 
 from dotenv import load_dotenv
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter  # LangChain 1.x path
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.vectorstores import FAISS
@@ -127,15 +127,25 @@ def calculator(first_num: float, second_num: float, operation: str) -> dict:
 @tool
 def get_stock_price(symbol: str) -> dict:
     """
-    Fetch latest stock price for a given symbol (e.g. 'AAPL', 'TSLA') 
-    using Alpha Vantage with API key in the URL.
+    Fetch latest stock price for a given symbol (e.g. 'AAPL', 'TSLA')
+    using Alpha Vantage.
     """
-    url = (
-        "https://www.alphavantage.co/query"
-        f"?function=GLOBAL_QUOTE&symbol={symbol}&apikey=C9PE94QUEW9VWGFM"
-    )
-    r = requests.get(url)
-    return r.json()
+    # Security fix: read the key from the environment instead of hardcoding it,
+    # and bound the request with a timeout.
+    api_key = os.getenv("ALPHAVANTAGE_API_KEY")
+    if not api_key:
+        return {"error": "ALPHAVANTAGE_API_KEY is not set; stock prices are unavailable."}
+    try:
+        r = requests.get(
+            "https://www.alphavantage.co/query",
+            params={"function": "GLOBAL_QUOTE", "symbol": symbol, "apikey": api_key},
+            timeout=10,
+        )
+        r.raise_for_status()
+        return r.json()
+    except requests.RequestException:
+        # Do not echo the exception: it can contain the request URL (and key).
+        return {"error": f"Stock price request failed for '{symbol}'."}
 
 
 @tool

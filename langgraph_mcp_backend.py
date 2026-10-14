@@ -10,6 +10,7 @@ from langchain_core.tools import tool, BaseTool
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from dotenv import load_dotenv
 import aiosqlite
+import os
 import requests
 import asyncio
 import threading
@@ -49,12 +50,25 @@ search_tool = DuckDuckGoSearchRun(region="us-en")
 @tool
 def get_stock_price(symbol: str) -> dict:
     """
-    Fetch latest stock price for a given symbol (e.g. 'AAPL', 'TSLA') 
-    using Alpha Vantage with API key in the URL.
+    Fetch latest stock price for a given symbol (e.g. 'AAPL', 'TSLA')
+    using Alpha Vantage.
     """
-    url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey=C9PE94QUEW9VWGFM"
-    r = requests.get(url)
-    return r.json()
+    # Security fix: read the key from the environment instead of hardcoding it,
+    # and bound the request with a timeout.
+    api_key = os.getenv("ALPHAVANTAGE_API_KEY")
+    if not api_key:
+        return {"error": "ALPHAVANTAGE_API_KEY is not set; stock prices are unavailable."}
+    try:
+        r = requests.get(
+            "https://www.alphavantage.co/query",
+            params={"function": "GLOBAL_QUOTE", "symbol": symbol, "apikey": api_key},
+            timeout=10,
+        )
+        r.raise_for_status()
+        return r.json()
+    except requests.RequestException:
+        # Do not echo the exception: it can contain the request URL (and key).
+        return {"error": f"Stock price request failed for '{symbol}'."}
 
 
 client = MultiServerMCPClient(

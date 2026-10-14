@@ -1,0 +1,32 @@
+# Tool configuration only (dependencies are pinned in requirements*.txt).
+[project]
+name = "omniflow-ai"
+version = "0.6.0"
+description = "OmniFlow AI - One AI. Every Task. Seamless Execution."
+requires-python = ">=3.12,<3.13"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+markers = [
+    "live: calls real external APIs; skipped unless credentials are configured",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+# The original CampusX tutorial scripts are kept as-is and not linted.
+extend-exclude = [
+    "langgraph_*.py",
+    "langraph_rag_backend.py",
+    "streamlit_frontend*.py",
+    "streamlit_rag_frontend.py",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S"]
+ignore = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S107", "S608"]  # fake credentials; tests build SQL on purpose

@@ -1,0 +1,12 @@
+# Optional: dependencies for the original CampusX tutorial scripts
+# (streamlit_frontend*.py / langgraph_*_backend.py / langraph_rag_backend.py).
+# These scripts use OpenAI (OPENAI_API_KEY) and are NOT part of OmniFlow AI.
+-r requirements.txt
+
+langchain-openai==1.7.0
+langchain-community==0.4.2
+langgraph-checkpoint-sqlite==3.1.1
+langchain-mcp-adapters==0.3.2
+aiosqlite==0.22.1
+faiss-cpu==1.15.1
+requests==2.34.2

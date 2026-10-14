@@ -1,0 +1,30 @@
+[theme]
+# OmniFlow light-pink theme (tokens mirrored in omniflow/ui/theme.py).
+base = "light"
+primaryColor = "#D85B8B"            # rose accent: buttons, focus, selected states
+backgroundColor = "#FFF7FA"         # main background
+secondaryBackgroundColor = "#FBEAF1"  # inputs, expanders, code, chat bubbles
+textColor = "#493344"               # dark plum
+linkColor = "#B0457A"
+borderColor = "#EBD2DE"
+dataframeBorderColor = "#EBD2DE"
+codeBackgroundColor = "#FBF1F6"
+showWidgetBorder = true
+baseRadius = "0.75rem"
+buttonRadius = "0.75rem"
+headingFontWeights = [700, 650, 600, 600, 600, 600]
+chartCategoricalColors = ["#D85B8B", "#8B7FD1", "#4FA898", "#E79A6B", "#B9A7E8", "#E6A1BE", "#5E8FCB"]
+
+[theme.sidebar]
+backgroundColor = "#FDECF3"
+secondaryBackgroundColor = "#FFFFFF"
+borderColor = "#EBD2DE"
+
+[browser]
+# Do not send Streamlit usage telemetry.
+gatherUsageStats = false
+
+[server]
+# Hard cap (MB) on any single upload, enforced by Streamlit before the app sees the file.
+# OmniFlow's own PDF limit (OMNIFLOW_RAG_MAX_FILE_MB, default 20) is checked again in code.
+maxUploadSize = 25
