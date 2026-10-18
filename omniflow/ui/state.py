@@ -6,6 +6,7 @@ time so tests can substitute fakes.
 
 from __future__ import annotations
 
+import re
 import sqlite3
 import time
 import uuid
@@ -66,6 +67,8 @@ def get_sql_service() -> SqlService:
 
 
 SESSION_OWNER_PREFIX = "s-"
+OWNER_PARAM = "o"  # URL query parameter holding the per_session owner key
+_OWNER_KEY = re.compile(r"^[0-9a-f]{32}$")
 logger = get_logger("ui.state")
 
 
@@ -73,14 +76,32 @@ def owner_id() -> str:
     """Who owns saved conversations and memories in this browser session.
 
     single_user: everything belongs to one local owner (a private install).
-    per_session: a random owner per browser session, so visitors of a shared deployment
-    can never list, open or delete each other's data.
+    per_session: a random owner per browser, so visitors of a shared deployment can never
+    list, open or delete each other's data. A browser refresh starts a new Streamlit
+    session (empty session_state), so the owner's random key is also kept in the URL
+    (`?o=`, see remember_owner) and read back here; otherwise every refresh would create a
+    new owner and hide all earlier conversations. The key is 128 random bits, unguessable,
+    but anyone given the full URL can open that owner's conversations.
     """
     if get_settings().effective_access_mode == "single_user":
         return LOCAL_OWNER
     if "owner_id" not in st.session_state:
-        st.session_state["owner_id"] = SESSION_OWNER_PREFIX + uuid.uuid4().hex
+        key = st.query_params.get(OWNER_PARAM)
+        if not (isinstance(key, str) and _OWNER_KEY.match(key)):
+            key = uuid.uuid4().hex
+        st.session_state["owner_id"] = SESSION_OWNER_PREFIX + key
     return st.session_state["owner_id"]
+
+
+def remember_owner() -> None:
+    """per_session: keep this session's owner key in the URL so a refresh restores it.
+
+    Re-applied on every run because switching pages clears query parameters."""
+    if get_settings().effective_access_mode == "single_user":
+        return
+    key = owner_id().removeprefix(SESSION_OWNER_PREFIX)
+    if st.query_params.get(OWNER_PARAM) != key:
+        st.query_params[OWNER_PARAM] = key
 
 
 def _stale_cutoff() -> float:
@@ -400,6 +421,10 @@ def ensure_session() -> None:
     st.session_state.setdefault("data_reports", [])
     st.session_state.setdefault("data_results", [])
     st.session_state.setdefault("sql_results", [])
+    # Switching pages clears query parameters; put the keys a refresh needs back in the URL.
+    remember_owner()
+    if st.session_state.get("messages"):
+        remember_conversation(st.session_state["thread_id"])
 
 
 def tool_context() -> ToolContext:

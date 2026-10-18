@@ -64,8 +64,10 @@ def render_history() -> None:
         st.caption(notice)
     st.markdown("**Conversations**")
     if settings.effective_access_mode == "per_session":
-        st.caption("Private to this browser session. On this shared deployment, conversations "
-                   "can't be reopened after you close or refresh the tab.")
+        st.caption("Private to you: the key in this page's address (`?o=…`) is what reopens "
+                   "them, so a refresh keeps them, but don't share that link. They're deleted "
+                   "after a period of inactivity, and the server's disk isn't guaranteed to "
+                   "survive a restart or redeploy.")
     if not conversations:
         st.caption("No saved conversations yet. Your chats are saved here automatically.")
         return

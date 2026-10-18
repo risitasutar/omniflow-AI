@@ -22,7 +22,8 @@ CLOUDFLARE_STEPS = """**Free image generation with Cloudflare Workers AI:**
    https://dash.cloudflare.com/profile/api-tokens with the **Workers AI** permission for
    that account.
 4. In `.env`: `OMNIFLOW_IMAGE_PROVIDER=cloudflare`, `CLOUDFLARE_ACCOUNT_ID=...`,
-   `CLOUDFLARE_API_TOKEN=...`, then restart the app.
+   `CLOUDFLARE_API_TOKEN=...`, then restart the app. On Streamlit Community Cloud, add the
+   same three as **root-level** entries in the app's Secrets (not under a `[section]`).
 
 Free plan: 10,000 Neurons/day; beyond that requests fail instead of being billed. Prompts
 are sent to Cloudflare. The model (FLUX.1 schnell) is subject to Black Forest Labs' terms:

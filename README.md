@@ -631,7 +631,12 @@ agent checkpoints.
 2. On share.streamlit.io choose the repo, branch and `app.py`. Under **Advanced settings**:
    - Choose **Python 3.12**, the documented default; the pinned packages are tested on 3.12.
    - Paste your secrets as TOML, e.g. `GEMINI_API_KEY = "…"`. Root-level secrets are
-     exposed as environment variables, which is how OmniFlow reads them. Never commit `.env`.
+     exposed as environment variables, which is how OmniFlow reads them; entries under a
+     `[section]` are **not**, so keep every entry at the top level. Never commit `.env`.
+   - Settings that only exist in your local `.env` are not deployed. To match your local
+     app, also add `GEMINI_MODEL`, and for image generation `OMNIFLOW_IMAGE_PROVIDER =
+     "cloudflare"`, `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (and `TAVILY_API_KEY`
+     if you use Tavily). Without `OMNIFLOW_IMAGE_PROVIDER`, image generation stays disabled.
 3. Leave `OMNIFLOW_ACCESS_MODE` unset (`auto`). On Community Cloud it becomes
    `per_session`; see below.
 
@@ -640,7 +645,7 @@ agent checkpoints.
 | | Locally (this PC) | Streamlit Community Cloud |
 |---|---|---|
 | Conversations, images, agent memory, saved memories | Kept across restarts in `data/` | Written to the app's local disk, which Streamlit doesn't document as persistent. Expect them to be lost on reboot, redeploy or sleep (apps sleep after 12 h without traffic) |
-| Who can see saved data | You (single user) | `per_session`: each browser session has a private owner. Visitors can't see each other's conversations or memories, but you also can't reopen your own after closing or refreshing the tab. Data older than 24 h from such sessions is purged |
+| Who can see saved data | You (single user) | `per_session`: each visitor gets a private owner whose random key is kept in the page address (`?o=…`). A refresh, or reopening that exact link, restores their conversations and memories; other visitors can't see them. Anyone given the full link can, so don't share it. Data not used for 24 h is purged (`OMNIFLOW_SESSION_DATA_TTL_HOURS`, up to 720) |
 | Uploaded PDFs, datasets | Memory only (session) | Memory only (session) |
 
 - Set `OMNIFLOW_ACCESS_MODE=single_user` in the Cloud secrets **only** if the app is private

@@ -146,8 +146,9 @@ def _storage_banner(store_ok: bool) -> None:
         return
     if settings.effective_access_mode == "per_session":
         st.warning(
-            "**Temporary on this deployment.** Memories are private to this browser session "
-            "and can't be reached after you close or refresh the tab. The server's disk is "
+            "**Temporary on this deployment.** Memories are private to you and are reopened "
+            "by the key in this page's address (`?o=…`): a refresh keeps them, a new link or "
+            "another browser doesn't, and you shouldn't share that link. The server's disk is "
             "also not guaranteed to survive a restart or redeploy, so treat everything here "
             "as temporary.")
     elif settings.hosted_on_community_cloud:

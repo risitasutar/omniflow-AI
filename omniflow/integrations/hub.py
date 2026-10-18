@@ -33,8 +33,13 @@ class IntegrationsHub:
         perms = ("Sends your prompt to Cloudflare Workers AI (flux-1-schnell)",)
         if provider == "disabled":
             return IntegrationInfo("images", "Image generation", Status.DISABLED,
-                                   "Disabled (OMNIFLOW_IMAGE_PROVIDER=disabled). Gemini image "
-                                   "output has no free tier, so it isn't used.", ENV_VARS,
+                                   "Disabled (OMNIFLOW_IMAGE_PROVIDER is 'disabled' or not set). "
+                                   "To enable free image generation, set "
+                                   "OMNIFLOW_IMAGE_PROVIDER=cloudflare with CLOUDFLARE_ACCOUNT_ID "
+                                   "and CLOUDFLARE_API_TOKEN - in .env locally, or as root-level "
+                                   "entries in Streamlit Cloud Secrets - then restart the app. "
+                                   "(Gemini image output has no free tier, so it isn't used.)",
+                                   ENV_VARS,
                                    CLOUDFLARE_SETUP_URL, perms)
         if provider == "mock":
             return IntegrationInfo("images", "Image generation", Status.MOCK,
@@ -44,7 +49,8 @@ class IntegrationsHub:
         if not (self.settings.cloudflare_account_id and self.settings.cloudflare_api_token):
             return IntegrationInfo("images", "Image generation", Status.NEEDS_SETUP,
                                    "OMNIFLOW_IMAGE_PROVIDER=cloudflare, but CLOUDFLARE_ACCOUNT_ID "
-                                   "or CLOUDFLARE_API_TOKEN is missing from .env.", ENV_VARS,
+                                   "or CLOUDFLARE_API_TOKEN is missing (add both to .env "
+                                   "locally, or to Streamlit Cloud Secrets).", ENV_VARS,
                                    CLOUDFLARE_SETUP_URL, perms)
         return IntegrationInfo("images", "Image generation", Status.CONNECTED,
                                "Cloudflare Workers AI is configured (credentials are checked "
